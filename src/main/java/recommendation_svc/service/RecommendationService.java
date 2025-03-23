@@ -29,7 +29,7 @@ public class RecommendationService {
     public Recommendation sendRecommendation(RecommendationRequest recommendationRequest) {
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("p3nsak@gmail.com");
+        message.setTo("sineadfly@gmail.com");
         message.setSubject("New Recommendation from " + recommendationRequest.getUserEmail());
         message.setText(recommendationRequest.getContent());
 
@@ -51,6 +51,6 @@ public class RecommendationService {
     }
 
     public List<Recommendation> getAllRecommendations() {
-        return recommendationRepository.findAll();
+        return recommendationRepository.findAllByOrderByCreatedOnDesc();
     }
 }
