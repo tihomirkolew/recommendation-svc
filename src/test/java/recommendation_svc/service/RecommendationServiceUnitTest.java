@@ -13,9 +13,10 @@ import recommendation_svc.web.dto.RecommendationRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,8 @@ class RecommendationServiceUnitTest {
 
     @Test
     void sendRecommendation_shouldSendEmailAndSaveRecommendation() {
-        // Arrange
+
+        // given
         RecommendationRequest request = RecommendationRequest.builder()
                 .userEmail("user1@user.user")
                 .content("Great service!")
@@ -48,10 +50,10 @@ class RecommendationServiceUnitTest {
 
         when(recommendationRepository.save(any(Recommendation.class))).thenReturn(savedRecommendation);
 
-        // Act
+        // when
         Recommendation result = recommendationService.sendRecommendation(request);
 
-        // Assert
+        // then
         SimpleMailMessage expectedMessage = new SimpleMailMessage();
         expectedMessage.setTo("sineadfly@gmail.com");
         expectedMessage.setSubject("New Recommendation from user1@user.user");
@@ -64,7 +66,8 @@ class RecommendationServiceUnitTest {
 
     @Test
     void sendRecommendation_whenMailSenderFails_shouldLogWarningAndSaveRecommendation() {
-        // Arrange
+
+        // given
         RecommendationRequest request = RecommendationRequest.builder()
                 .userEmail("user1@user.user")
                 .content("Great service!")
@@ -78,13 +81,12 @@ class RecommendationServiceUnitTest {
 
         when(recommendationRepository.save(any(Recommendation.class))).thenReturn(savedRecommendation);
 
-
         doThrow(new RuntimeException("Mail sending failed")).when(mailSender).send(any(SimpleMailMessage.class));
 
-        // Act
+        // when
         Recommendation result = recommendationService.sendRecommendation(request);
 
-        // Assert
+        // then
         verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
         verify(recommendationRepository, times(1)).save(any(Recommendation.class));
         assertThat(result).isEqualTo(savedRecommendation);
@@ -93,7 +95,7 @@ class RecommendationServiceUnitTest {
     @Test
     void getAllRecommendations_shouldReturnRecommendationListOrderedByCreationDesc() {
 
-        // Arrange
+        // given
         Recommendation savedRecommendation1 = Recommendation.builder()
                 .userEmail("email@email.com")
                 .content("Great service!")
@@ -106,17 +108,39 @@ class RecommendationServiceUnitTest {
                 .createdOn(LocalDateTime.now())
                 .build();
 
-        when(recommendationRepository.findAllByOrderByCreatedOnDesc())
+        when(recommendationRepository.findAllByOrderByArchivedAscCreatedOnDesc())
                 .thenReturn(List.of(savedRecommendation2, savedRecommendation1));
 
-        // Act
+        // when
         List<Recommendation> allRecommendations = recommendationService.getAllRecommendations();
 
-        // Assert
+        // then
         assertNotNull(allRecommendations);
         assertEquals(allRecommendations.get(0), savedRecommendation2);
         assertEquals(allRecommendations.get(1), savedRecommendation1);
-        verify(recommendationRepository, times(1)).findAllByOrderByCreatedOnDesc();
+        verify(recommendationRepository, times(1)).findAllByOrderByArchivedAscCreatedOnDesc();
+    }
+
+    @Test
+    void archiveRecommendation_happyPath () {
+
+        // given
+        UUID id = UUID.randomUUID();
+        Recommendation mockRecommendation = Recommendation.builder()
+                .id(id)
+                .archived(false)
+                .build();
+
+        when(recommendationRepository.findById(id)).thenReturn(Optional.of(mockRecommendation));
+
+        // when
+        recommendationService.archiveRecommendation(id);
+
+        // then
+        verify(recommendationRepository).findById(id);
+        verify(recommendationRepository).save(mockRecommendation);
+
+        assertTrue(mockRecommendation.isArchived());
     }
 
 }

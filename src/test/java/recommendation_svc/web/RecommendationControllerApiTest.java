@@ -16,10 +16,11 @@ import recommendation_svc.web.mapper.ResponseToRecommendationMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,6 +38,7 @@ public class RecommendationControllerApiTest {
     @Test
     void getRequestGetAllRecommendations_happyPath() throws Exception {
 
+        // build
         Recommendation recommendation1 = Recommendation.builder()
                 .userEmail("email@email.com")
                 .content("Poor app.")
@@ -49,7 +51,7 @@ public class RecommendationControllerApiTest {
                 .createdOn(LocalDateTime.now())
                 .build();
 
-
+        // send
         when(recommendationService.getAllRecommendations()).thenReturn(List.of(recommendation1, recommendation2));
         MockHttpServletRequestBuilder request = get("/api/v1/recommendations");
 
@@ -65,6 +67,7 @@ public class RecommendationControllerApiTest {
 
     @Test
     void testSendRecommendation() throws Exception {
+
         // build
         RecommendationRequest recommendationRequest = RecommendationRequest.builder()
                 .userEmail("user@example.com")
@@ -90,5 +93,20 @@ public class RecommendationControllerApiTest {
                 .andExpect(jsonPath("$.userEmail").value(recommendationResponse.getUserEmail()))
                 .andExpect(jsonPath("$.content").value(recommendationResponse.getContent()))
                 .andExpect(jsonPath("$.createdOn").exists());
+    }
+
+    @Test
+    void testArchiveRecommendation() throws Exception {
+
+        // build
+        UUID recommendationId = UUID.randomUUID();
+
+        doNothing().when(recommendationService).archiveRecommendation(recommendationId);
+
+        // send
+        MockHttpServletRequestBuilder request = post("/api/v1/recommendations/{id}/archive", recommendationId);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
     }
 }

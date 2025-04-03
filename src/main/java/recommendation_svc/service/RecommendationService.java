@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -36,6 +37,7 @@ public class RecommendationService {
                 .userEmail(recommendationRequest.getUserEmail())
                 .content(recommendationRequest.getContent())
                 .createdOn(LocalDateTime.now())
+                .archived(false)
                 .build();
 
         try {
@@ -49,6 +51,14 @@ public class RecommendationService {
     }
 
     public List<Recommendation> getAllRecommendations() {
-        return recommendationRepository.findAllByOrderByCreatedOnDesc();
+        return recommendationRepository.findAllByOrderByArchivedAscCreatedOnDesc();
+    }
+
+    public void archiveRecommendation(UUID id) {
+        Recommendation recommendation = recommendationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Recommendation not found"));
+
+        recommendation.setArchived(true);
+        recommendationRepository.save(recommendation);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -39,5 +40,11 @@ public class RecommendationController {
     @GetMapping
     public ResponseEntity<List<Recommendation>> getAllRecommendations() {
         return ResponseEntity.ok(recommendationService.getAllRecommendations());
+    }
+
+    @PostMapping("/{id}/archive")
+    public ResponseEntity<Void> archiveRecommendation(@PathVariable UUID id) {
+        recommendationService.archiveRecommendation(id);
+        return ResponseEntity.noContent().build();
     }
 }

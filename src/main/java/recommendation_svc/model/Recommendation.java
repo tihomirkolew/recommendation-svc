@@ -28,4 +28,7 @@ public class Recommendation {
     @NotNull
     private LocalDateTime createdOn;
 
+    @NotNull
+    private boolean archived;
+
 }

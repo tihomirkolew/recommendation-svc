@@ -10,5 +10,5 @@ import java.util.UUID;
 @Repository
 public interface RecommendationRepository extends JpaRepository<Recommendation, UUID> {
 
-    List<Recommendation> findAllByOrderByCreatedOnDesc();
+    List<Recommendation> findAllByOrderByArchivedAscCreatedOnDesc();
 }

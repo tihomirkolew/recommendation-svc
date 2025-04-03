@@ -18,18 +18,18 @@ public class ResponseToRecommendationMapperUnitTest {
     @Test
     void testFromRecommendationMapperSuccessfullyMapsRecommendationToResponse() {
 
-        // Given
+        // given
         Recommendation recommendation = Recommendation.builder()
                 .userEmail("email@email.com")
                 .content("I suggest you moderate your app more!")
                 .createdOn(LocalDateTime.now())
                 .build();
 
-        // When
+        // when
         RecommendationResponse response =
                 ResponseToRecommendationMapper.fromRecommendation(recommendation);
 
-        // Then
+        // then
         assertNotNull(response);
         assertEquals(recommendation.getUserEmail(), response.getUserEmail());
         assertEquals(recommendation.getContent(), response.getContent());
