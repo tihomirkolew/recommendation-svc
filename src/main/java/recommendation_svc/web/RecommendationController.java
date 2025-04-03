@@ -4,7 +4,7 @@ import recommendation_svc.model.Recommendation;
 import recommendation_svc.service.RecommendationService;
 import recommendation_svc.web.dto.RecommendationRequest;
 import recommendation_svc.web.dto.RecommendationResponse;
-import recommendation_svc.web.mapper.DtoMapper;
+import recommendation_svc.web.mapper.ResponseToRecommendationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class RecommendationController {
 
         Recommendation recommendation = recommendationService.sendRecommendation(recommendationRequest);
 
-        RecommendationResponse response = DtoMapper.fromRecommendation(recommendation);
+        RecommendationResponse response = ResponseToRecommendationMapper.fromRecommendation(recommendation);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

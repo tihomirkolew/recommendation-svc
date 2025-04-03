@@ -5,7 +5,7 @@ import recommendation_svc.web.dto.RecommendationResponse;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class DtoMapper {
+public class ResponseToRecommendationMapper {
 
     public static RecommendationResponse fromRecommendation(Recommendation recommendation) {
 

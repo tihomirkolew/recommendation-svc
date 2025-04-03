@@ -16,7 +16,6 @@ import java.util.List;
 @Slf4j
 public class RecommendationService {
 
-
     private final RecommendationRepository recommendationRepository;
     private final MailSender mailSender;
 
@@ -45,7 +44,6 @@ public class RecommendationService {
         } catch (Exception e) {
             log.warn("Failed sending recommendation");
         }
-
 
         return recommendationRepository.save(recommendation);
     }
